@@ -1,356 +1,542 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LLM Something — Explore the Future of AI</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-  :root {
-    --bg: #0a0a0f;
-    --surface: #13131a;
-    --border: #1e1e2e;
-    --text: #e4e4ed;
-    --muted: #6b6b80;
-    --accent: #a78bfa;
-    --accent2: #7c3aed;
-    --glow: rgba(167, 139, 250, 0.15);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-    line-height: 1.6;
-  }
-
-  /* Animated background grid */
-  .bg-grid {
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(167,139,250,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(167,139,250,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Floating orbs */
-  .orb {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(100px);
-    opacity: 0.12;
-    pointer-events: none;
-    z-index: 0;
-    animation: orbFloat 20s ease-in-out infinite;
-  }
-  .orb-1 {
-    width: 600px; height: 600px;
-    background: var(--accent);
-    top: -200px; left: -100px;
-    animation-delay: 0s;
-  }
-  .orb-2 {
-    width: 500px; height: 500px;
-    background: #3b82f6;
-    top: 40%; right: -150px;
-    animation-delay: -7s;
-  }
-  .orb-3 {
-    width: 400px; height: 400px;
-    background: #f472b6;
-    bottom: -100px; left: 30%;
-    animation-delay: -14s;
-  }
-
-  @keyframes orbFloat {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    25% { transform: translate(40px, -30px) scale(1.05); }
-    50% { transform: translate(-20px, 20px) scale(0.95); }
-    75% { transform: translate(-30px, -10px) scale(1.03); }
-  }
-
-  /* Main container */
-  .container {
-    position: relative;
-    z-index: 1;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 80px 24px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-  }
-
-  /* Badge */
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 16px;
-    border-radius: 100px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 32px;
-    animation: fadeInUp 0.6s ease-out;
-  }
-  .badge-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: #22c55e;
-    animation: pulse 2s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  /* Hero */
-  .hero {
-    text-align: center;
-    animation: fadeInUp 0.6s ease-out 0.1s both;
-  }
-  .hero h1 {
-    font-size: clamp(42px, 7vw, 80px);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    line-height: 1.08;
-    margin-bottom: 20px;
-  }
-  .gradient-text {
-    background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 30%, #3b82f6 60%, #22d3ee 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .hero p {
-    font-size: 18px;
-    color: var(--muted);
-    max-width: 560px;
-    margin: 0 auto 40px;
-    font-weight: 400;
-    letter-spacing: -0.01em;
-  }
-
-  /* CTA buttons */
-  .cta-group {
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 14px 28px;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.25s ease;
-    border: none;
-    letter-spacing: -0.01em;
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #fff;
-    box-shadow: 0 0 30px var(--glow), 0 4px 20px rgba(124, 58, 237, 0.3);
-  }
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 50px var(--glow), 0 8px 30px rgba(124, 58, 237, 0.4);
-  }
-  .btn-secondary {
-    background: var(--surface);
-    color: var(--text);
-    border: 1px solid var(--border);
-  }
-  .btn-secondary:hover {
-    border-color: var(--accent);
-    background: rgba(167, 139, 250, 0.06);
-  }
-
-  /* Feature cards */
-  .features {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 16px;
-    width: 100%;
-    margin-top: 80px;
-    animation: fadeInUp 0.6s ease-out 0.3s both;
-  }
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    transition: all 0.3s ease;
-  }
-  .card:hover {
-    border-color: rgba(167, 139, 250, 0.3);
-    transform: translateY(-4px);
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
-  }
-  .card-icon {
-    font-size: 28px;
-    margin-bottom: 16px;
-    display: block;
-  }
-  .card h3 {
-    font-size: 17px;
-    font-weight: 600;
-    margin-bottom: 8px;
-    letter-spacing: -0.01em;
-  }
-  .card p {
-    font-size: 14px;
-    color: var(--muted);
-    line-height: 1.55;
-  }
-
-  /* Footer */
-  .footer {
-    margin-top: 80px;
-    text-align: center;
-    color: var(--muted);
-    font-size: 13px;
-    animation: fadeInUp 0.6s ease-out 0.5s both;
-  }
-  .footer a {
-    color: var(--accent);
-    text-decoration: none;
-  }
-  .footer a:hover { text-decoration: underline; }
-
-  /* Animations */
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* Scroll indicator */
-  .scroll-indicator {
-    position: absolute;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%);
-    animation: fadeInUp 0.6s ease-out 0.7s both, bounce 2s ease-in-out 1.2s infinite;
-    color: var(--muted);
-    font-size: 13px;
-    text-align: center;
-  }
-  .scroll-arrow {
-    display: block;
-    margin-top: 4px;
-    font-size: 20px;
-  }
-  @keyframes bounce {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(8px); }
-  }
-
-  /* Responsive */
-  @media (max-width: 600px) {
-    .container { padding: 48px 16px; }
-    .features { grid-template-columns: 1fr; }
-    .btn { width: 100%; justify-content: center; }
-  }
-</style>
-</head>
-<body>
-
-<div class="bg-grid"></div>
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-<div class="orb orb-3"></div>
-
-<main class="container">
-  <div class="badge">
-    <span class="badge-dot"></span>
-    LLM Something — v0.1.0
-  </div>
-
-  <section class="hero">
-    <h1>
-      <span class="gradient-text">LLM</span><br>
-      Something
-    </h1>
-    <p>
-      A playground for experimenting with large language models,
-      building AI-native tools, and exploring the frontier of
-      machine intelligence.
-    </p>
-    <div class="cta-group">
-      <a href="https://github.com/ybcan/LLM-Something" class="btn btn-primary" target="_blank">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-        View on GitHub
-      </a>
-      <a href="#features" class="btn btn-secondary">
-        Explore Features &darr;
-      </a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111721" />
+    <meta
+      name="description"
+      content="连接长期方向与每日行动的个人工作台：学习、计划、待办、随手记与实验。"
+    />
+    <title>战略工作台 · 把今天，连到长远</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 5 56 18v28L32 59 8 46V18ZM8 18l24 14 24-14M32 32v27M32 5v27' fill='none' stroke='%237ce8ee' stroke-width='4'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./app.mjs"></script>
+  </head>
+  <body>
+    <a href="#main" class="skip-link">跳到工作区</a>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="./" aria-label="战略工作台首页"
+          ><span data-icon="cube"></span><span>战略工作台</span></a
+        >
+        <nav class="primary-nav" aria-label="工作区导航">
+          <button class="active" data-view="overview" aria-current="page">
+            <span data-icon="home"></span>总览
+          </button>
+          <button data-view="learning">
+            <span data-icon="layers"></span>学习与计划
+          </button>
+          <button data-view="tasks">
+            <span data-icon="check"></span>待办事项
+          </button>
+          <button data-view="notes">
+            <span data-icon="note"></span>随手记
+          </button>
+          <button data-view="lab">
+            <span data-icon="flask"></span>实验空间
+          </button>
+        </nav>
+        <div class="sidebar-directions">
+          <div class="nav-caption">长期方向</div>
+          <div id="direction-nav"></div>
+        </div>
+        <div class="sidebar-bottom">
+          <div class="local-heading">
+            <span data-icon="document"></span
+            ><span id="local-heading">本地工作区</span
+            ><span class="status-light" id="status-light"></span>
+          </div>
+          <p id="save-status">示例内容，尚未保存个人记录</p>
+          <button class="subtle-link" id="sidebar-settings">
+            数据与备份 ↗
+          </button>
+        </div>
+      </aside>
+      <main id="main" class="main">
+        <div class="topbar">
+          <div class="breadcrumb">
+            个人空间 <span>/</span> <strong id="view-name">总览</strong>
+          </div>
+          <div class="topbar-tools">
+            <label class="search-box"
+              ><span data-icon="search"></span
+              ><input
+                id="global-search"
+                type="search"
+                maxlength="300"
+                aria-label="搜索工作区"
+                placeholder="搜索工作区"
+              /><kbd>/</kbd></label
+            ><button class="workspace-badge" id="example-status">
+              示例工作区</button
+            ><span class="avatar" aria-label="个人空间">我</span>
+          </div>
+        </div>
+        <header class="page-header">
+          <div>
+            <div class="overline">YOUR PERSONAL WORKSPACE</div>
+            <h1 id="page-title">把今天，连到长远。</h1>
+            <p id="page-subtitle">
+              学习、行动、想法与实验，在一个工作空间里继续。
+            </p>
+          </div>
+          <button class="button primary" id="quick-add">
+            <span data-icon="plus"></span>快速记录
+          </button>
+        </header>
+        <div class="storage-alert" id="storage-alert" hidden role="alert">
+          <p id="storage-message"></p>
+          <button class="subtle-link" id="alert-settings">数据设置 →</button>
+        </div>
+        <section
+          class="direction-strip"
+          id="direction-strip"
+          aria-label="按长期方向筛选"
+        ></section>
+        <div class="filter-bar" id="filter-bar" hidden>
+          <span data-icon="filter"></span><span id="filter-label"></span
+          ><button id="clear-filters">清除筛选 ×</button>
+        </div>
+        <div class="overview-grid" id="overview-grid">
+          <section
+            class="panel learning-workspace"
+            id="learning-workspace"
+            aria-labelledby="learning-heading"
+          >
+            <div class="section-heading">
+              <h2 id="learning-heading">
+                <span data-icon="layers"></span>学习与计划
+              </h2>
+              <div class="heading-actions">
+                <span class="mini-label" id="project-summary"></span
+                ><button
+                  class="icon-button"
+                  data-new="projects"
+                  aria-label="新建学习任务"
+                  title="新建学习任务"
+                >
+                  <span data-icon="plus"></span>
+                </button>
+              </div>
+            </div>
+            <div class="projects-list" id="projects-list"></div>
+            <div class="section-heading plan-heading">
+              <h2><span data-icon="calendar"></span>计划推进</h2>
+              <div class="heading-actions">
+                <span class="mini-label">从准备到沉淀</span
+                ><button
+                  class="icon-button"
+                  data-new="plans"
+                  aria-label="新建计划"
+                  title="新建计划"
+                >
+                  <span data-icon="plus"></span>
+                </button>
+              </div>
+            </div>
+            <div class="plan-columns" id="plan-columns"></div>
+          </section>
+          <div class="right-column" id="right-column">
+            <section
+              class="panel tasks-panel"
+              id="tasks-panel"
+              aria-labelledby="tasks-heading"
+            >
+              <div class="section-heading">
+                <h2 id="tasks-heading">
+                  <span data-icon="check"></span>待办事项
+                  <span class="count" id="task-count"></span>
+                </h2>
+                <select
+                  class="compact-select"
+                  id="task-filter"
+                  aria-label="待办状态"
+                >
+                  <option value="pending">待完成</option>
+                  <option value="done">已完成</option>
+                  <option value="all">全部</option>
+                </select>
+              </div>
+              <div id="tasks-list"></div>
+              <form class="inline-add" id="task-quick">
+                <span data-icon="plus"></span
+                ><input
+                  id="task-text"
+                  maxlength="300"
+                  placeholder="添加待办"
+                  aria-label="新待办内容"
+                  required
+                /><button aria-label="添加待办" title="添加待办">
+                  <span data-icon="arrow-right"></span>
+                </button>
+              </form>
+            </section>
+            <section
+              class="panel notes-panel"
+              id="notes-panel"
+              aria-labelledby="notes-heading"
+            >
+              <div class="section-heading">
+                <h2 id="notes-heading"><span data-icon="note"></span>随手记</h2>
+                <span class="mini-label" id="note-count"></span>
+              </div>
+              <form class="note-composer" id="note-form">
+                <textarea
+                  id="note-text"
+                  maxlength="10000"
+                  aria-label="随手记内容"
+                  placeholder="先留住这个想法…"
+                  required
+                ></textarea>
+                <div class="composer-bottom">
+                  <select
+                    id="note-direction"
+                    class="compact-select"
+                    aria-label="随手记关联方向"
+                  ></select
+                  ><button class="button small primary" id="note-save">
+                    记下来 <span data-icon="return"></span>
+                  </button>
+                </div>
+              </form>
+              <div id="notes-list"></div>
+            </section>
+          </div>
+        </div>
+        <section class="panel tool-dock" id="tool-dock" aria-label="网站与工具">
+          <div class="website-dock">
+            <div class="dock-heading">
+              <h2><span data-icon="link"></span>常用网站</h2>
+              <button
+                class="icon-button"
+                data-new="sites"
+                aria-label="添加常用网站"
+                title="添加常用网站"
+              >
+                <span data-icon="plus"></span>
+              </button>
+            </div>
+            <div class="site-tiles" id="sites-list"></div>
+          </div>
+          <div class="experiment-dock">
+            <div class="dock-heading">
+              <h2><span data-icon="flask"></span>实验空间</h2>
+              <button class="subtle-link" id="open-lab">查看实验 ↗</button>
+            </div>
+            <div class="tool-tiles">
+              <button class="dock-tile" data-tool="focus">
+                <span data-icon="clock"></span><span>专注计时</span></button
+              ><button class="dock-tile" data-tool="text">
+                <span data-icon="document"></span><span>文本处理</span></button
+              ><button class="dock-tile" data-tool="json">
+                <span data-icon="braces"></span><span>JSON 整理</span></button
+              ><button class="dock-tile new-tile" data-new="experiments">
+                <span data-icon="plus"></span><span>新实验</span>
+              </button>
+            </div>
+          </div>
+        </section>
+        <section class="panel lab-library" id="lab-library" hidden>
+          <div class="section-heading">
+            <h2><span data-icon="flask"></span>我的实验</h2>
+            <button class="button small" data-new="experiments">
+              <span data-icon="plus"></span>记录实验
+            </button>
+          </div>
+          <p class="section-description">
+            给小工具一个生长的地方。记录构想、跟进开发，或打开已完成的工具。
+          </p>
+          <div class="experiment-list" id="experiment-list"></div>
+        </section>
+        <footer class="page-footer">
+          <span
+            ><span class="live-dot"></span>只在当前浏览器保存
+            <span class="footer-divider">/</span> AI 会话与 ima 尚未接入</span
+          ><button class="subtle-link" id="footer-export">
+            导出我的工作区 <span data-icon="download"></span>
+          </button>
+        </footer>
+        <noscript
+          ><div class="storage-alert">
+            需要启用 JavaScript 才能使用战略工作台。所有内容在浏览器中处理。
+          </div></noscript
+        >
+      </main>
+      <aside class="focus-rail" aria-label="专注计时">
+        <div class="focus-label">专注时间</div>
+        <div id="focus-time" class="focus-time" aria-label="剩余专注时间">
+          25:00
+        </div>
+        <button
+          id="focus-toggle"
+          class="focus-play"
+          aria-label="开始专注"
+          title="开始专注"
+        >
+          <span data-icon="play"></span></button
+        ><button
+          id="focus-reset"
+          class="rail-button"
+          aria-label="重置专注"
+          title="重置专注"
+        >
+          <span data-icon="stop"></span></button
+        ><button
+          id="focus-settings"
+          class="rail-button"
+          aria-label="设置专注时长"
+          title="设置专注时长"
+        >
+          <span data-icon="sliders"></span>
+        </button>
+        <div class="rail-bottom">
+          <button
+            id="settings-button"
+            class="rail-button"
+            aria-label="数据与备份设置"
+            title="数据与备份"
+          >
+            <span data-icon="settings"></span>
+          </button>
+        </div>
+      </aside>
     </div>
-  </section>
-
-  <section class="features" id="features">
-    <div class="card">
-      <span class="card-icon">&#x1F9E0;</span>
-      <h3>LLM Playground</h3>
-      <p>Test prompts, compare models, and benchmark responses across different LLM providers in one place.</p>
-    </div>
-    <div class="card">
-      <span class="card-icon">&#x1F4CA;</span>
-      <h3>Smart Money Analytics</h3>
-      <p>Real-time Polymarket smart money tracking — identify profitable traders, detect bots, and follow the whales.</p>
-    </div>
-    <div class="card">
-      <span class="card-icon">&#x1F916;</span>
-      <h3>Agent Experiments</h3>
-      <p>Build and test autonomous AI agents with tool-use, memory, and multi-step reasoning capabilities.</p>
-    </div>
-    <div class="card">
-      <span class="card-icon">&#x2699;&#xFE0F;</span>
-      <h3>Open Source</h3>
-      <p>Everything is open source. Fork it, hack it, ship it. MIT licensed and community-driven.</p>
-    </div>
-    <div class="card">
-      <span class="card-icon">&#x1F4AC;</span>
-      <h3>Multi-Provider</h3>
-      <p>Claude, GPT, Gemini, DeepSeek — switch between models with a unified interface and response comparison.</p>
-    </div>
-    <div class="card">
-      <span class="card-icon">&#x26A1;</span>
-      <h3>Fast & Modern</h3>
-      <p>Built with the latest web technologies for a snappy, accessible experience on any device.</p>
-    </div>
-  </section>
-
-  <footer class="footer">
-    <p>
-      Built with &#x2764; by <a href="https://github.com/ybcan">ybcan</a> &middot;
-      <a href="https://github.com/ybcan/LLM-Something">GitHub</a> &middot;
-      MIT License
-    </p>
-  </footer>
-
-  <div class="scroll-indicator" style="position:relative;bottom:auto;margin-top:48px;" aria-hidden="true">
-    scroll down
-    <span class="scroll-arrow">&darr;</span>
-  </div>
-</main>
-
-</body>
+    <dialog
+      id="record-dialog"
+      class="dialog record-dialog"
+      aria-labelledby="record-heading"
+    >
+      <form id="record-form">
+        <div class="dialog-header">
+          <div>
+            <div class="overline">MAKE ROOM FOR WHAT MATTERS</div>
+            <h2 id="record-heading">快速记录</h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button"
+            data-close="record-dialog"
+            aria-label="关闭记录窗口"
+          >
+            <span data-icon="close"></span>
+          </button>
+        </div>
+        <label class="field" id="kind-field"
+          >记录类型<select id="record-kind">
+            <option value="tasks">待办事项</option>
+            <option value="projects">学习任务</option>
+            <option value="plans">计划</option>
+            <option value="notes">随手记</option>
+            <option value="sites">常用网站</option>
+            <option value="experiments">实验</option>
+          </select></label
+        ><label class="field" id="title-field"
+          >名称<input
+            id="record-title"
+            maxlength="300"
+            autocomplete="off"
+            placeholder="想学什么，或想做什么？" /></label
+        ><label class="field" id="body-field" hidden
+          >内容<textarea
+            id="record-body"
+            maxlength="10000"
+            rows="5"
+            placeholder="先把思考留下来…"
+          ></textarea>
+        </label>
+        <div class="form-row">
+          <label class="field" id="direction-field"
+            >关联方向<select id="record-direction"></select></label
+          ><label class="field" id="due-field"
+            >目标日期（可不填）<input id="record-due" type="date"
+          /></label>
+        </div>
+        <label class="field" id="steps-field" hidden
+          >学习步骤 <span class="field-hint">每行一项，最多 100 项</span
+          ><textarea
+            id="record-steps"
+            maxlength="30000"
+            rows="4"
+            placeholder="理解关键概念&#10;动手做一次练习&#10;独立解释并验证"
+          ></textarea></label
+        ><label class="field" id="status-field" hidden
+          >状态<select id="record-status"></select></label
+        ><label class="field" id="url-field" hidden
+          >网址
+          <span class="field-hint" id="url-hint"
+            >使用 https:// 或 http:// 地址</span
+          ><input
+            id="record-url"
+            type="url"
+            maxlength="2000"
+            placeholder="https://example.com"
+        /></label>
+        <p class="form-error" id="record-error" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button
+            type="button"
+            class="button danger-text"
+            id="record-delete"
+            hidden
+          >
+            删除记录
+          </button>
+          <div class="spacer"></div>
+          <button type="button" class="button" data-close="record-dialog">
+            取消</button
+          ><button class="button primary" id="record-submit">保存记录</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog
+      id="settings-dialog"
+      class="dialog"
+      aria-labelledby="settings-heading"
+    >
+      <div class="dialog-header">
+        <div>
+          <div class="overline">YOUR DATA, YOUR SPACE</div>
+          <h2 id="settings-heading">数据与备份</h2>
+        </div>
+        <button
+          class="icon-button"
+          id="settings-close"
+          data-close="settings-dialog"
+          aria-label="关闭数据设置"
+        >
+          <span data-icon="close"></span>
+        </button>
+      </div>
+      <p class="dialog-description">
+        内容保存在当前浏览器，不会自动上传。更换设备、清理浏览器数据前，请先导出备份。这里不存放
+        API 密钥。
+      </p>
+      <div class="settings-row">
+        <div>
+          <h3>导出工作区</h3>
+          <p>备份学习、计划、待办、笔记、网站和实验。</p>
+        </div>
+        <button class="button" id="export-button">
+          <span data-icon="download"></span>导出 JSON
+        </button>
+      </div>
+      <div class="settings-row">
+        <div>
+          <h3>恢复备份</h3>
+          <p>校验文件后，由你确认替换当前工作区。</p>
+        </div>
+        <button class="button" id="import-button">
+          <span data-icon="upload"></span>选择文件</button
+        ><input
+          id="import-file"
+          type="file"
+          accept="application/json,.json"
+          hidden
+        />
+      </div>
+      <div class="settings-row">
+        <div>
+          <h3>清除示例内容</h3>
+          <p>保留你自己添加的记录和常用网站。</p>
+        </div>
+        <button class="button" id="clear-examples">清除示例</button>
+      </div>
+      <div class="settings-row recovery-row" id="recovery-row" hidden>
+        <div>
+          <h3>恢复异常记录</h3>
+          <p>原始数据没有被覆盖。可先下载，再重建工作区。</p>
+        </div>
+        <div class="recovery-actions">
+          <button class="button" id="export-raw">下载原始数据</button
+          ><button class="button danger-text" id="reset-workspace">
+            重建工作区
+          </button>
+        </div>
+      </div>
+      <p class="settings-message" id="settings-message" role="status"></p>
+      <div class="settings-note">
+        <span data-icon="lock"></span>当前版本不包含账户、云同步或 AI/ima
+        自动导入。
+      </div>
+    </dialog>
+    <dialog
+      id="tool-dialog"
+      class="dialog tool-dialog"
+      aria-labelledby="tool-heading"
+    >
+      <div class="dialog-header">
+        <div>
+          <div class="overline">EXPERIMENT SPACE</div>
+          <h2 id="tool-heading"></h2>
+        </div>
+        <button
+          class="icon-button"
+          id="tool-close"
+          data-close="tool-dialog"
+          aria-label="关闭工具"
+        >
+          <span data-icon="close"></span>
+        </button>
+      </div>
+      <p class="dialog-description">在当前浏览器运行，不上传输入内容。</p>
+      <div id="tool-content"></div>
+    </dialog>
+    <dialog
+      id="focus-dialog"
+      class="dialog compact-dialog"
+      aria-labelledby="focus-heading"
+    >
+      <form id="focus-form">
+        <div class="dialog-header">
+          <h2 id="focus-heading">留一段专注时间</h2>
+          <button
+            type="button"
+            class="icon-button"
+            data-close="focus-dialog"
+            aria-label="关闭专注设置"
+          >
+            <span data-icon="close"></span>
+          </button>
+        </div>
+        <p class="dialog-description">
+          计时在本页运行。刷新或关闭网页后会重置。
+        </p>
+        <div class="duration-options">
+          <button type="button" data-minutes="15">15 分钟</button
+          ><button type="button" data-minutes="25">25 分钟</button
+          ><button type="button" data-minutes="50">50 分钟</button>
+        </div>
+        <label class="field"
+          >自定义分钟数<input
+            type="number"
+            id="focus-minutes"
+            min="1"
+            max="180"
+            step="1"
+            value="25"
+            required
+        /></label>
+        <div class="dialog-actions">
+          <button class="button primary">设定时长并重置</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog
+      id="confirm-dialog"
+      class="dialog compact-dialog"
+      aria-labelledby="confirm-heading"
+    >
+      <div class="dialog-header"><h2 id="confirm-heading">确认操作</h2></div>
+      <p class="dialog-description" id="confirm-description"></p>
+      <div class="dialog-actions">
+        <button class="button" id="confirm-cancel">取消</button
+        ><button class="button primary" id="confirm-accept">确认</button>
+      </div>
+    </dialog>
+    <div class="toast" id="toast" role="status" hidden></div>
+  </body>
 </html>

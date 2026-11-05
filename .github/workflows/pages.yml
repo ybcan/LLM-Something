@@ -1,0 +1,52 @@
+name: 战略工作台 · 验证与发布
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: strategy-workbench-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: 验证工作台数据与工具
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --test tests/*.test.mjs
+
+  pages:
+    name: 发布战略工作台
+    if: github.event_name != 'pull_request'
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v4
+      - name: 准备网站文件
+        run: |
+          mkdir -p "$RUNNER_TEMP/strategy-workbench"
+          cp index.html styles.css app.mjs workspace.mjs "$RUNNER_TEMP/strategy-workbench/"
+          touch "$RUNNER_TEMP/strategy-workbench/.nojekyll"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ runner.temp }}/strategy-workbench
+      - name: 部署
+        id: deployment
+        uses: actions/deploy-pages@v4
